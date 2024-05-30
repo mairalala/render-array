@@ -1,52 +1,66 @@
-import React from 'react'
-import { useState } from 'react'
 import Person from './Person';
+import { useState } from 'react';
 
-const Persons = () => {
+export const Persons = ({persons, setPersons}) => {
 
-    const[persons, setPersons]= useState( [
-        {
-            id:1,
-            name: "laura ramirez",
-            role: "Frontend Developer",
-            img: "https://bootdey.com/img/Content/avatar/avatar3.png",
-        },
-        {
-            id:2,
-            name: "luis",
-            role: "Backend Developer",
-            img: "https://bootdey.com/img/Content/avatar/avatar6.png",
-        },
-        {
-            id:1,
-            name: "floro",
-            role: "UI/UX Designer",
-            img: "https://bootdey.com/img/Content/avatar/avatar1.png",
-        },
-    ]
-        
-    );
+    const [editinId, setEditinID] = useState(null);
+    const [editedPerson, setEditedPerson] = useState({
+        name:'',
+        role:'',
+        img:''
+    });
+    const [ isEditing, setIsEditing]= useState(false);
+    const handleChange =(e)=>{
+        const{ name, value}= e.target;
+        setEditedPerson(prevState =>({
+            ...prevState,
+            [name]:value
+        }));
+    }
+    const handleEdit = (id)=>{
+        setEditinID(id);
+        setIsEditing(true);
+        const personToEdit = persons.find(person =>person.id===id);
+        setEditedPerson({...personToEdit})
+    }
+
+    const handelSave=(e)=>{
+        setPersons(persons.map(person=> person.id=== editinId? editedPerson:person));
+        setEditinID(null);
+        setEditedPerson({name: '', role:'',img:''});
+        setIsEditing(false);
+    }
 
   return (
     <div>
         <h2>IT Team</h2>
         <div className='container d-flex justify-content-center'>
-        <div className='d-flex flex-row'>
+            <div className='d-flex flex-row'>
             {persons.map((person)=> {
-            return(
-                <div>
-                    <Person
-                    key={person.id}
-                    name= {person.name}
-                    role={person.role}
-                    img={person.img}
-                     />
-                </div>
-            ) 
-        })}
+                return(
+                    <div>
+                        <Person
+                        key={person.id}
+                        name= {person.name}
+                        role={person.role}
+                        img={person.img}
+                        handleEdit={()=>handleEdit(person.id)}
+                        />
+                    </div>
+                ) 
+            })}
+            </div>
         </div>
+        <div className='mt-4 row p-2'>
+            <hr />
+            <h2>Modificar datos</h2>
+            <input type="text" name='name' value={editedPerson.name} onChange={handleChange} placeholder='Nombre'className='form-control mb-2'/>
+            <input type="text" name='role' value={editedPerson.role} onChange={handleChange} placeholder='Role'className='form-control mb-2'/>
+            <input type="text" name='img' value={editedPerson.img} onChange={handleChange} placeholder='URL de la imagen'className='form-control mb-2'/>
+            <div className='mt-2'>
+            <button className=' btn btn-primary' onClick={handelSave}>Guardar</button>
+            </div>
         </div>
-        
     </div>
   )
 }
